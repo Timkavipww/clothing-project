@@ -1,3 +1,6 @@
+using Application.Extensions;
+using Domain.Exceptions;
+
 namespace Application.Services;
 
 public class ClothingService : IClothingService
@@ -9,6 +12,7 @@ public class ClothingService : IClothingService
     }
     public async Task AddAsync(ClothingCreateDTO clo, CancellationToken cts)
     {
+
         var entity = new ClothingItem
         {
             Id = clo.Id,
@@ -16,6 +20,7 @@ public class ClothingService : IClothingService
             Name = clo.Name,
             CreatedAt = DateTime.UtcNow
         };
+        
 
         await _cloRepo.AddAsync(entity, cts);
     }
@@ -43,15 +48,17 @@ public class ClothingService : IClothingService
         return new ClothingResponseDTO {Brand = entity.Brand, Id = entity.Id, Name = entity.Name};
     }
 
-    public async Task UpdateAsync(ClothingUpdateDTO clo, CancellationToken cts)
+    public async Task<ClothingResponseDTO> UpdateAsync(Guid id, ClothingUpdateDTO clo, CancellationToken cts)
     {
-        var entity = await _cloRepo.GetByIdAsync(clo.Id, cts);
-        var newEntity = new ClothingItem
-        {
-            Name = clo.Name,
-            BrandId = clo.BrandId
-        };
-        await _cloRepo.UpdateAsync(newEntity, cts);
+        var entity = await _cloRepo.GetByIdAsync(id, cts);
+
+        if(entity is null)
+            throw new EntityNotFoundException($"Clothing with id {id} not found");
+        
+        entity.Update(clo);
+
+        await _cloRepo.UpdateAsync(entity, cts);
+        return new ClothingResponseDTO{ Name = entity.Name, Brand = entity.Brand, Id = entity.Id};
     }
 
 }

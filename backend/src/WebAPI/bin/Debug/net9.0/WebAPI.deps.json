@@ -660,7 +660,8 @@
       "Infrastructure/1.0.0": {
         "dependencies": {
           "Application": "1.0.0",
-          "Microsoft.EntityFrameworkCore": "9.0.4"
+          "Microsoft.EntityFrameworkCore": "9.0.4",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4"
         },
         "runtime": {
           "Infrastructure.dll": {

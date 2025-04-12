@@ -6,12 +6,16 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=cloDB;Port=5432;Database=clothingDB;Username=postgres;Password=1234
     ports:
       - 3000:3000
+    depends_on:
+      cloDB:
+        condition: service_healthy
     networks:
       - app-network
   cloDB:
-    container_name: clothingDB
     image: postgres:latest
     environment:
       POSTGRES_USER: postgres
@@ -19,6 +23,13 @@ services:
       POSTGRES_DB: clothingDB
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d clothingDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - app-network
     
@@ -26,3 +37,11 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis-data:
+    driver: local
+  opensearch_data:
+    driver: local
