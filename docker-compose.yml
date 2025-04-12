@@ -1,0 +1,28 @@
+services:
+  backend:
+    container_name: backend
+    build:
+      context: ./backend/src
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - 3000:3000
+    networks:
+      - app-network
+  cloDB:
+    container_name: clothingDB
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: clothingDB
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    
+
+networks:
+  app-network:
+    driver: bridge
